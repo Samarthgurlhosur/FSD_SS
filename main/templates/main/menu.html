@@ -1,0 +1,246 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Menu | My Restaurant</title>
+
+    <style>
+        * {
+            margin: 0; padding: 0;
+            box-sizing: border-box;
+            font-family: "Poppins", sans-serif;
+        }
+
+        body {
+            background: #fff7f0;
+            color: #333;
+        }
+
+        /* NAVBAR */
+        nav {
+            width: 100%;
+            padding: 18px 40px;
+            background: #ffffffee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; left: 0;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+            z-index: 999;
+        }
+
+        nav h2 { color: #d35400; font-weight: 700; }
+        nav a {
+            margin-left: 25px;
+            text-decoration: none;
+            color: #555;
+            font-weight: 600;
+            transition: 0.3s;
+        }
+        nav a:hover { color: #d35400; }
+
+        /* PAGE TITLE */
+        .title {
+            margin-top: 120px;
+            text-align: center;
+            font-size: 40px;
+            color: #d35400;
+            font-weight: 700;
+        }
+
+        /* MENU GRID */
+        .menu-container {
+            margin: 50px auto;
+            max-width: 1000px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 30px;
+            padding: 0 40px;
+        }
+
+        .item-card {
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+            transition: 0.3s;
+            cursor: pointer;
+        }
+        .item-card:hover { transform: translateY(-10px); }
+
+        .item-card img {
+            width: 100%;
+            height: 170px;
+            border-radius: 15px;
+            object-fit: cover;
+            margin-bottom: 15px;
+        }
+
+        .item-card h3 { color: #d35400; }
+
+        .price {
+            margin-top: 8px;
+            font-weight: bold;
+            color: #333;
+            font-size: 18px;
+        }
+
+        /* MODAL */
+        .modal-bg {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: rgba(0,0,0,0.55);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-box {
+            width: 450px;
+            background: #fff;
+            border-radius: 20px;
+            padding: 25px;
+            animation: pop 0.4s ease;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+        }
+
+        @keyframes pop {
+            from { transform: scale(0.5); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-box img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .modal-title {
+            margin-top: 15px;
+            font-size: 28px;
+            font-weight: 700;
+            color: #d35400;
+        }
+
+        .modal-desc {
+            margin: 10px 0;
+            color: #555;
+        }
+
+        .modal-price {
+            font-size: 22px;
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        .order-btn {
+            width: 100%;
+            margin-top: 15px;
+            padding: 14px;
+            background: #d35400;
+            border: none;
+            color: #fff;
+            border-radius: 30px;
+            cursor: pointer;
+            font-size: 17px;
+            transition: 0.3s;
+        }
+        .order-btn:hover {
+            background: #b74400;
+            transform: translateY(-3px);
+        }
+
+        .close-btn {
+            text-align: center;
+            margin-top: 10px;
+            color: #d35400;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVBAR -->
+    <nav>
+        <h2>CUBE Resto</h2>
+        <div>
+            <a href="/">Home</a>
+            <a href="/menu/">Menu</a>
+            <a href="/contact/">Contact</a>
+        </div>
+    </nav>
+
+    <!-- TITLE -->
+    <h1 class="title">Our Delicious Menu</h1>
+
+    <!-- MENU GRID -->
+    <div class="menu-container">
+        {% for item in items %}
+        <div class="item-card"
+             onclick="openModal('{{ item.name }}', '{{ item.price }}', '{{ item.image }}')">
+
+            <img src="{{ item.image }}">
+            <h3>{{ item.name }}</h3>
+            <div class="price">{{ item.price }}</div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- POPUP MODAL -->
+    <div class="modal-bg" id="modal">
+        <div class="modal-box">
+            <img id="modal-img">
+            <h2 class="modal-title" id="modal-title"></h2>
+
+            <p class="modal-desc">
+                Fresh, tasty and prepared with premium quality ingredients.
+            </p>
+
+            <p class="modal-price" id="modal-price"></p>
+
+            <button class="order-btn" onclick="orderNow()">Order Now 🍽️</button>
+
+            <div class="close-btn" onclick="closeModal()">Close</div>
+        </div>
+    </div>
+
+    <!-- JS SCRIPT -->
+    <script>
+        // OPEN POPUP
+        function openModal(name, price, image) {
+            document.getElementById("modal").style.display = "flex";
+            document.getElementById("modal-title").innerText = name;
+            document.getElementById("modal-price").innerText = "Price: " + price;
+            document.getElementById("modal-img").src = image;
+        }
+
+        // CLOSE POPUP
+        function closeModal() {
+            document.getElementById("modal").style.display = "none";
+        }
+
+        // ORDER BUTTON (You can later redirect to cart/checkout page)
+        function orderNow() {
+            alert("Thanks for ordering! Redirecting to order page...");
+        }
+
+        // CLICK OUTSIDE TO CLOSE
+        window.onclick = function(e) {
+            if (e.target.id === "modal") {
+                closeModal();
+            }
+        }
+    </script>
+
+</body>
+</html>
